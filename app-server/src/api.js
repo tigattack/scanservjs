@@ -50,7 +50,11 @@ module.exports = new class Api {
     if (!fileInfo.exists()) {
       throw new Error(`File '${fileName}' does not exist`);
     }
-    await application.userOptions().action(actionName).execute(fileInfo);
+    try {
+      return await application.userOptions().action(actionName).execute(fileInfo);
+    } catch(exception) {
+      return Promise.reject(exception);
+    }
   }
 
   /**

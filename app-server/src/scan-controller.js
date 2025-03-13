@@ -113,7 +113,11 @@ class ScanController {
 
     const fileInfo = FileInfo.create(destination);
     if ('afterAction' in this.pipeline) {
-      userOptions.action(this.pipeline.afterAction).execute(fileInfo);
+      try {
+        await userOptions.action(this.pipeline.afterAction).execute(fileInfo);
+      } catch (exception) {
+        return Promise.reject(exception);
+      }
     }
 
     return fileInfo;

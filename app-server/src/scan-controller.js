@@ -179,8 +179,12 @@ class ScanController {
     }
 
     if (this.finishUp) {
-      const file = await this.finish();
-      await userOptions.afterScan(file);
+      try {
+        const file = await this.finish();
+        await userOptions.afterScan(file);
+      } catch (exception) {
+        return Promise.reject(exception);
+      };
       return {
         file
       };

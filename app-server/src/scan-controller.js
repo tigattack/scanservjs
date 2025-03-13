@@ -208,6 +208,10 @@ module.exports = {
    */
   async run(req) {
     const scan = new ScanController();
-    return await scan.execute(req);
+    try {
+      return await scan.execute(req);
+    } catch (exception) {
+      return Promise.reject(exception);
+    };
   }
 };

@@ -88,6 +88,16 @@ module.exports = {
   },
 
   /**
+   * This method is called before fetching the device list. You can use this
+   * to modify the configuration or perform other setup tasks.
+   * @param {Configuration} config
+   */
+  beforeDeviceList(config) {
+    // Example: Modify the devices array
+    // config.devices.push('additional-device-id');
+  },
+
+  /**
    * This method is called after devices have been read (from the scanner or
    * disk) but before being returned to anything else. You can use this to
    * override default settings from the scanner, or resolution options or

@@ -22,6 +22,21 @@ module.exports = class UserOptions {
   }
 
   /**
+   * Hook called before fetching the device list.
+   * @param {Configuration} config
+   * @returns {Promise.<any>}
+   */
+  async beforeDeviceList(config) {
+    try {
+      if (this.local && this.local.beforeDeviceList) {
+        return await this.local.beforeDeviceList(config);
+      }
+    } catch (error) {
+      console.error('Error in beforeDeviceList hook:', error);
+    }
+  }
+
+  /**
    * Passes a devices reference to config.local.js for customisation
    * @param {ScanDevice[]} devices
    */

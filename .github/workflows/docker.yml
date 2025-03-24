@@ -2,8 +2,8 @@ name: docker
 
 on:
   workflow_dispatch:
-  release:
-    types: [published]
+  push:
+    tags: ['v*']
 
 env:
   BUILD_TARGET: scanservjs-core

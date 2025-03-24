@@ -113,7 +113,11 @@ class ScanController {
 
     const fileInfo = FileInfo.create(destination);
     if ('afterAction' in this.pipeline) {
-      userOptions.action(this.pipeline.afterAction).execute(fileInfo);
+      try {
+        await userOptions.action(this.pipeline.afterAction).execute(fileInfo);
+      } catch (exception) {
+        return Promise.reject(exception);
+      }
     }
 
     return fileInfo;
@@ -175,8 +179,12 @@ class ScanController {
     }
 
     if (this.finishUp) {
-      const file = await this.finish();
-      await userOptions.afterScan(file);
+      try {
+        const file = await this.finish();
+        await userOptions.afterScan(file);
+      } catch (exception) {
+        return Promise.reject(exception);
+      };
       return {
         file
       };
@@ -200,6 +208,10 @@ module.exports = {
    */
   async run(req) {
     const scan = new ScanController();
-    return await scan.execute(req);
+    try {
+      return await scan.execute(req);
+    } catch (exception) {
+      return Promise.reject(exception);
+    };
   }
 };

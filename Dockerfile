@@ -28,6 +28,9 @@ RUN ./makedeb.sh
 # layer did not exist but testing would be slower and more painful.
 # ==============================================================================
 FROM debian:bookworm-slim AS scanservjs-base
+
+ARG DEBIAN_FRONTEND=noninteractive
+
 RUN apt-get update \
   && apt-get install -yq \
     nodejs \
@@ -58,6 +61,9 @@ RUN apt-get update \
 # own image with drivers then this is likely the image to start from.
 # ==============================================================================
 FROM scanservjs-base AS scanservjs-core
+
+ARG DEBIAN_FRONTEND=noninteractive
+  
 ENV \
   # This goes into /etc/sane.d/net.conf
   SANED_NET_HOSTS="" \

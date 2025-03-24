@@ -59,6 +59,9 @@ module.exports = new class Application {
     const config = this.config();
     const scanimageCommand = this.scanimageCommand();
     const file = FileInfo.create(config.devicesPath);
+
+    await this.userOptions().beforeDeviceList(config);
+
     let devices = null;
 
     if (file.exists()) {

@@ -78,65 +78,63 @@ RUN ["chmod", "+x", "/entrypoint.sh"]
 ENTRYPOINT [ "/entrypoint.sh" ]
 
 # Copy the code and install
-COPY --from=scanservjs-build "/app/debian/scanservjs_*.deb" "/"
-RUN apt-get install ./scanservjs_*.deb \
-  && rm -f ./scanservjs_*.deb
+RUN --mount=type=bind,from=scanservjs-build,source=/app/debian,target=/app/debian apt-get install /app/debian/scanservjs_*.deb
 
 WORKDIR /usr/lib/scanservjs
 
 EXPOSE 8080
 
-# User2001 image
-#
-# This image changes the executing user to 2001 for increased security. This
-# also, however, leads to some runtime issues with parameters. This was the
-# default behaviour from v2.9.0 until v2.18.1 and was because issue #177. This
-# stage is kept for backwards compatibility.
-# ==============================================================================
-FROM scanservjs-core AS scanservjs-user2001
+# # User2001 image
+# #
+# # This image changes the executing user to 2001 for increased security. This
+# # also, however, leads to some runtime issues with parameters. This was the
+# # default behaviour from v2.9.0 until v2.18.1 and was because issue #177. This
+# # stage is kept for backwards compatibility.
+# # ==============================================================================
+# FROM scanservjs-core AS scanservjs-user2001
 
-# Make it possible to override the UID/GID/username of the user running
-# scanservjs
-ARG UID=2001
-ARG GID=2001
-ARG UNAME=scanservjs
+# # Make it possible to override the UID/GID/username of the user running
+# # scanservjs
+# ARG UID=2001
+# ARG GID=2001
+# ARG UNAME=scanservjs
 
-# Create a known user, and change ownership on relevant files (the entrypoint
-# script and $APP_DIR must be readable to run the service itself, and some
-# config files need write access).
-RUN groupadd -g $GID -o $UNAME \
-  && useradd -o -u $UID -g $GID -m -s /bin/bash $UNAME \
-  && chown -R $UID:$GID /entrypoint.sh /var/lib/scanservjs /etc/sane.d/net.conf /etc/sane.d/airscan.conf
-USER $UNAME
+# # Create a known user, and change ownership on relevant files (the entrypoint
+# # script and $APP_DIR must be readable to run the service itself, and some
+# # config files need write access).
+# RUN groupadd -g $GID -o $UNAME \
+#   && useradd -o -u $UID -g $GID -m -s /bin/bash $UNAME \
+#   && chown -R $UID:$GID /entrypoint.sh /var/lib/scanservjs /etc/sane.d/net.conf /etc/sane.d/airscan.conf
+# USER $UNAME
 
-# default build
-FROM scanservjs-core
+# # default build
+# FROM scanservjs-core
 
-# hplip image
-#
-# This image adds the HP scanner libs to the image. This target is not built by
-# default - you will need to specifically target it.
-# ==============================================================================
-FROM scanservjs-core AS scanservjs-hplip
-RUN apt-get update \
-  && apt-get install -yq libsane-hpaio \
-  && apt-get clean \
-  && rm -rf /var/lib/apt/lists/* \
-  && echo hpaio >> /etc/sane.d/dll.conf
+# # hplip image
+# #
+# # This image adds the HP scanner libs to the image. This target is not built by
+# # default - you will need to specifically target it.
+# # ==============================================================================
+# FROM scanservjs-core AS scanservjs-hplip
+# RUN apt-get update \
+#   && apt-get install -yq libsane-hpaio \
+#   && apt-get clean \
+#   && rm -rf /var/lib/apt/lists/* \
+#   && echo hpaio >> /etc/sane.d/dll.conf
 
-# brscan4 image
-#
-# This image includes the brscan4 driver which is needed for some Brother
-# printers/scanners. This target is not built by default -
-# you will need to specifically target it.
-# ==============================================================================
-FROM scanservjs-core AS scanservjs-brscan4
-RUN apt-get update \
-  && apt-get install -yq curl \
-  && curl -fSsL "https://download.brother.com/welcome/dlf105200/brscan4-0.4.11-1.amd64.deb" -o /tmp/brscan4.deb \
-  && apt-get remove curl -yq \
-  && apt-get clean \
-  && rm -rf /var/lib/apt/lists/* \
-  && dpkg -i /tmp/brscan4.deb \
-  && rm /tmp/brscan4.deb \
-  && echo brscan4 >> /etc/sane.d/dll.conf
+# # brscan4 image
+# #
+# # This image includes the brscan4 driver which is needed for some Brother
+# # printers/scanners. This target is not built by default -
+# # you will need to specifically target it.
+# # ==============================================================================
+# FROM scanservjs-core AS scanservjs-brscan4
+# RUN apt-get update \
+#   && apt-get install -yq curl \
+#   && curl -fSsL "https://download.brother.com/welcome/dlf105200/brscan4-0.4.11-1.amd64.deb" -o /tmp/brscan4.deb \
+#   && apt-get remove curl -yq \
+#   && apt-get clean \
+#   && rm -rf /var/lib/apt/lists/* \
+#   && dpkg -i /tmp/brscan4.deb \
+#   && rm /tmp/brscan4.deb \
+#   && echo brscan4 >> /etc/sane.d/dll.conf

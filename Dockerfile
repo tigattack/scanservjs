@@ -3,14 +3,21 @@
 # The builder image builds the core javascript app and debian package
 # ==============================================================================
 FROM node:18-bookworm-slim AS scanservjs-build
+
+ARG DEBIAN_FRONTEND=noninteractive
+
 ENV APP_DIR=/app
+
 WORKDIR "$APP_DIR"
 
 COPY package*.json build.js "$APP_DIR/"
 COPY app-server/package*.json "$APP_DIR/app-server/"
 COPY app-ui/package*.json "$APP_DIR/app-ui/"
 
-RUN npm clean-install .
+RUN apt update &&\
+    apt install -y xz-utils &&\
+    npm clean-install . &&\
+    rm -rf /var/lib/apt/lists/*
 
 COPY app-server/ "$APP_DIR/app-server/"
 COPY app-ui/ "$APP_DIR/app-ui/"
@@ -63,7 +70,7 @@ RUN apt-get update \
 FROM scanservjs-base AS scanservjs-core
 
 ARG DEBIAN_FRONTEND=noninteractive
-  
+
 ENV \
   # This goes into /etc/sane.d/net.conf
   SANED_NET_HOSTS="" \

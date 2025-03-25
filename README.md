@@ -11,6 +11,15 @@
 
 Copyright 2016-2023 [Sam Strachan](https://github.com/sbs20)
 
+## Fork Notice
+
+This is a fork of [sbs20/scanservjs](https://github.com/sbs20/scanservjs), modified for my own purposes.
+
+**Summary of changes:**
+- Added additional error handling in scan, afterScan, and fileAction executions.
+- Added `beforeDeviceList` hook. This is so I can send a webhook to Home Assistant to power on my printer-scanner unit before loading devices.
+- Modify test & release pipeline(s) for my own, simpler use case.
+
 ## What people are saying
 
 > I've decided to switch to using only this, I find using this in a browser is
